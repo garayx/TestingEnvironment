@@ -206,7 +206,7 @@ namespace BackupAndRestore
             for (var i = 0; i < MyBackupsList.Count; i++)
             {
                 if (MyBackupsList[i].RestoreResult == RestoreResult.Failed)
-                    ReportFailure("Got Failed Restore", null);
+                    ReportInfo("Got Failed Restore", null);
 
                 if (MyBackupsList[i].OperationStatus == OperationStatus.Faulted)
                 {
@@ -443,8 +443,9 @@ namespace BackupAndRestore
 
                     await re.ExecuteAsync(re.TopologyNodes.First(q => q.ClusterTag == backup.BackupStatus.NodeTag),
                         null, session.Advanced.Context, getOperationStateTaskCommand, shouldRetry: false).ConfigureAwait(false);
+                    await Task.Delay(2000).ConfigureAwait(false);
 
-                    while (getOperationStateTaskCommand.Result.Status == OperationStatus.InProgress)
+                    while (getOperationStateTaskCommand.Result == null || getOperationStateTaskCommand.Result.Status == OperationStatus.InProgress)
                     {
                         await Task.Delay(2000).ConfigureAwait(false);
                         await re.ExecuteAsync(re.TopologyNodes.First(q => q.ClusterTag == backup.BackupStatus.NodeTag),
